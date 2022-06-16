@@ -127,6 +127,11 @@
         "icon": "$(globe)"
       },
       {
+        "command": "gitpod.openBrowser",
+        "title": "%openBrowser%",
+        "icon": "$(globe)"
+      },
+      {
         "command": "gitpod.ports.retryAutoExpose",
         "title": "%retryAutoExpose%",
         "icon": "$(refresh)"
@@ -417,6 +422,16 @@
           "id": "gitpod.workspace",
           "name": "Gitpod Workspace"
         }
+      ],
+      "portView": [
+        {
+          "id": "gitpod.portView",
+          "name": "",
+          "type": "webview",
+          "contextualTitle": "",
+          "icon": "",
+          "visibility": "visible"
+        }
       ]
     },
     "authentication": [
@@ -486,17 +501,35 @@
           "default": false
         }
       }
+    },
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "portView",
+          "title": "PORTS",
+          "icon": ""
+        }
+      ]
     }
   },
   "scripts": {
-    "vscode:prepublish": "yarn run compile --cwd .."
+    "postinstall": "yarn install:webview",
+    "vscode:prepublish": "yarn build; yarn run compile --cwd ..",
+    "build": "yarn build:webview && yarn compile:ts",
+    "watch": "npm-run-all -lp watch:webview watch:ts",
+    "compile:ts": "tsc -p ./",
+    "watch:ts": "tsc -watch -p ./",
+    "install:webview": "yarn --cwd ./webview-ui --modules-folder node_modules",
+    "watch:webview": "yarn --cwd ./webview-ui run dev",
+    "build:webview": "yarn --cwd ./webview-ui run build"
   },
   "devDependencies": {
     "@types/node": "16.x",
     "@types/node-fetch": "^2.5.12",
     "@types/uuid": "8.0.0",
     "@types/yauzl": "^2.9.1",
-    "@types/yazl": "^2.4.2"
+    "@types/yazl": "^2.4.2",
+    "npm-run-all": "^4.1.5"
   },
   "dependencies": {
     "gitpod-shared": "0.0.1",
