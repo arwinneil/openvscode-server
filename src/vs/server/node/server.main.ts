@@ -15,6 +15,8 @@ import { performance } from 'perf_hooks';
 import { serverOptions } from 'vs/server/node/serverEnvironmentService';
 import product from 'vs/platform/product/common/product';
 import * as perf from 'vs/base/common/performance';
+import { getEnvVarWithPrefix, parseEnvVarAsArg } from 'vs/platform/environment/node/envHelpers';
+
 
 perf.mark('code/server/codeLoaded');
 (<any>global).vscodeServerCodeLoadedTime = performance.now();
@@ -34,7 +36,15 @@ const errorReporter: ErrorReporter = {
 	}
 };
 
-const args = parseArgs(process.argv.slice(2), serverOptions, errorReporter);
+const envPrefix = 'OPENVSCODE_';
+const envWithPrefix = getEnvVarWithPrefix(envPrefix);
+const envArgs = parseEnvVarAsArg(envPrefix, envWithPrefix);
+
+const argv = process.argv.slice(2);
+
+const allArgs = envArgs.concat(argv);
+
+const args = parseArgs(allArgs, serverOptions, errorReporter);
 
 const REMOTE_DATA_FOLDER = args['server-data-dir'] || process.env['VSCODE_AGENT_FOLDER'] || join(os.homedir(), product.serverDataFolderName || '.vscode-remote');
 const USER_DATA_PATH = join(REMOTE_DATA_FOLDER, 'data');
